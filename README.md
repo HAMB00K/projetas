@@ -144,7 +144,3 @@ Ou directement via l'URL : `http://$(minikube ip -p knative):31292`
 - `GET /api/students/:id` - Obtenir un étudiant
 - `PUT /api/students/:id` - Modifier un étudiant (optionnel)
 - `DELETE /api/students/:id` - Supprimer un étudiant (optionnel)
-
-## Date de Remise
-
-Vendredi 16 Janvier 2026
