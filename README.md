@@ -2,7 +2,7 @@
 
 ## Développeurs
 - Nassim Ben Saïd
-- [Nom du binôme si applicable]
+- Ahmed Istfalen
 
 ## Date de remise
 Vendredi 16 Janvier 2026
@@ -148,8 +148,3 @@ Ou directement via l'URL : `http://$(minikube ip -p knative):31292`
 ## Date de Remise
 
 Vendredi 16 Janvier 2026
-
-## Contact
-
-- Email: tondeur.herve@yahoo.fr
-- Email: herve.tondeur@uphf.fr
