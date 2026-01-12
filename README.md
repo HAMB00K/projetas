@@ -2,7 +2,9 @@
 
 ## Développeurs
 - Nassim Ben Saïd
+- n°étudiant : 22303346
 - Ahmed Istfalen
+- n°étudiant : 22303167
 
 ## Date de remise
 Vendredi 16 Janvier 2026
