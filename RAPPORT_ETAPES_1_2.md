@@ -15,7 +15,7 @@
 ```bash
 minikube start --profile knative --driver=docker
 ```
-
+![Screen](images_compte_rendu/s1.png)
 **Résultat:** Minikube démarre avec succès et crée un cluster Kubernetes avec le profil "knative".
 
 ---
@@ -27,7 +27,7 @@ minikube start --profile knative --driver=docker
 minikube profile list
 docker ps | grep minikube
 ```
-
+![Screen](images_compte_rendu/s2.png)
 **Résultat:**
 - Minikube utilise bien le driver Docker
 - Un conteneur Docker nommé "knative" est en cours d'exécution
@@ -41,12 +41,12 @@ docker ps | grep minikube
 ```bash
 minikube addons list --profile knative
 ```
-
+![Screen](images_compte_rendu/s3.png)
 **Résultat - Addons activés:**
-- ✅ **default-storageclass** - Kubernetes
-- ✅ **storage-provisioner** - minikube  
-- ✅ **registry** - minikube
-- ✅ **dashboard** - Kubernetes (activé manuellement)
+-  **default-storageclass** - Kubernetes
+-  **storage-provisioner** - minikube  
+-  **registry** - minikube
+-  **dashboard** - Kubernetes (activé manuellement)
 
 **Addons disponibles mais désactivés:**
 - ingress, metrics-server, istio, metallb, etc.
@@ -59,7 +59,7 @@ minikube addons list --profile knative
 ```bash
 minikube profile list
 ```
-
+![Screen](images_compte_rendu/s4.png)
 **Résultat:**
 ```
 PROFILE  DRIVER  RUNTIME  IP             VERSION  STATUS  NODES
@@ -83,7 +83,7 @@ knative  docker  docker   192.168.49.2   v1.32.0  OK      1
 ```bash
 minikube start --profile mon-nouveau-profil --driver=docker
 ```
-
+![Screen](images_compte_rendu/s5.png)
 **Qu'est-ce qu'un profil ?**
 Un profil Minikube permet de créer et gérer plusieurs clusters Kubernetes indépendants sur la même machine. Chaque profil a:
 - Sa propre configuration
@@ -104,7 +104,7 @@ Un profil Minikube permet de créer et gérer plusieurs clusters Kubernetes ind�
 ```bash
 minikube status --profile knative
 ```
-
+![Screen](images_compte_rendu/s6.png)
 **Résultat:**
 ```
 knative
@@ -130,6 +130,7 @@ kubeconfig: Configured
 ```bash
 minikube dashboard --profile knative
 ```
+![Screen](images_compte_rendu/s7.png)
 
 **Qu'est-ce que le Dashboard ?**
 Le Dashboard Kubernetes est une interface web qui permet de:
@@ -157,6 +158,7 @@ Le Dashboard Kubernetes est une interface web qui permet de:
 ```bash
 kubectl get nodes
 ```
+![Screen](images_compte_rendu/s8.png)
 
 **Résultat:**
 ```
@@ -194,6 +196,7 @@ minikube node delete <node-name> --profile knative
 ```bash
 minikube logs --profile knative
 ```
+![Screen](images_compte_rendu/s10.png)
 
 **Alternative pour logs en temps réel:**
 ```bash
@@ -216,6 +219,7 @@ minikube logs -f --profile knative
 ```bash
 minikube addons enable metrics-server --profile knative
 ```
+![Screen](images_compte_rendu/s11.png)
 
 **Pourquoi metrics-server ?**
 - Collecte les métriques de ressources (CPU, mémoire)
@@ -240,6 +244,7 @@ kubectl top pods
 ```bash
 minikube image ls --profile knative
 ```
+![Screen](images_compte_rendu/s12.png)
 
 **Résultat:** Liste toutes les images Docker présentes dans le cluster Minikube, incluant:
 - Images système Kubernetes (kube-apiserver, etcd, coredns, etc.)
@@ -254,7 +259,7 @@ minikube image ls --profile knative
 ```bash
 kubectl create deployment nginx --image=nginx
 ```
-
+![Screen](images_compte_rendu/s13.png)
 **Résultat:**
 ```
 deployment.apps/nginx created
@@ -274,7 +279,7 @@ kubectl get pods -l app=nginx
 ```bash
 kubectl expose deployment nginx --type=NodePort --port=80
 ```
-
+![Screen](images_compte_rendu/s14.png)
 **Résultat:**
 ```
 service/nginx exposed
@@ -294,13 +299,13 @@ service/nginx exposed
 kubectl get pods -l app=nginx
 kubectl describe pod -l app=nginx
 ```
-
+![Screen](images_compte_rendu/s15pod.png)
 **Commande pour le service:**
 ```bash
 kubectl get svc nginx
 kubectl describe svc nginx
 ```
-
+![Screen](images_compte_rendu/s15serv.png)
 **Informations affichées:**
 - **Pod**: Nom, statut, IP, nœud, image, ressources
 - **Service**: Type, ClusterIP, Port, NodePort, Endpoints
@@ -313,6 +318,7 @@ kubectl describe svc nginx
 ```bash
 minikube service nginx --url --profile knative
 ```
+![Screen](images_compte_rendu/s16.png)
 
 **Résultat:**
 ```
@@ -329,6 +335,7 @@ Cette URL permet d'accéder au service nginx depuis l'extérieur du cluster.
 ```bash
 minikube service nginx --profile knative
 ```
+![Screen](images_compte_rendu/s17.png)
 
 Cette commande ouvre automatiquement le navigateur par défaut avec l'URL du service.
 
@@ -350,7 +357,7 @@ kubectl exec -it <pod-name> -- /bin/bash
 
 **Exemple:**
 ```bash
-kubectl exec -it nginx-5869d7778c-s4pq6 -- /bin/bash
+kubectl exec -it nginx-66686b6766-pts7s -- /bin/bash
 ```
 
 **Une fois dans le conteneur:**
@@ -359,7 +366,7 @@ ls -la /usr/share/nginx/html/
 cat /etc/nginx/nginx.conf
 exit
 ```
-
+![Screen](images_compte_rendu/s18.png)
 ---
 
 ### 19. Lister les logs du conteneur nginx
@@ -371,17 +378,18 @@ kubectl logs <pod-name>
 
 **Exemple:**
 ```bash
-kubectl logs nginx-5869d7778c-s4pq6
+kubectl logs nginx-66686b6766-pts7s
 ```
+![Screen](images_compte_rendu/s19.png)
 
 **Pour suivre les logs en temps réel:**
 ```bash
-kubectl logs -f nginx-5869d7778c-s4pq6
+kubectl logs -f nginx-66686b6766-pts7s
 ```
 
 **Pour les dernières N lignes:**
 ```bash
-kubectl logs --tail=50 nginx-5869d7778c-s4pq6
+kubectl logs --tail=50 nginx-66686b6766-pts7s
 ```
 
 ---
@@ -392,23 +400,24 @@ kubectl logs --tail=50 nginx-5869d7778c-s4pq6
 ```bash
 minikube stop --profile knative
 ```
-
+![Screen](images_compte_rendu/s20p1.png)
 **Résultat:** Le cluster est arrêté mais les données persistent. Au prochain démarrage, tout sera restauré.
 
 **Pour supprimer complètement le cluster:**
 ```bash
 minikube delete --profile knative
 ```
+![Screen](images_compte_rendu/s20p2.png)
 
 ---
 
 ## Conclusion de l'Étape 1
 
 Toutes les manipulations Kubernetes de base ont été réalisées avec succès:
-- ✅ Configuration et gestion de Minikube
-- ✅ Gestion des profils et addons
-- ✅ Déploiement impératif de pods et services
-- ✅ Accès et debugging des applications
-- ✅ Consultation des logs et métriques
+-  Configuration et gestion de Minikube
+-  Gestion des profils et addons
+-  Déploiement impératif de pods et services
+-  Accès et debugging des applications
+-  Consultation des logs et métriques
 
 Le cluster Minikube est maintenant prêt pour le déploiement de l'architecture EDA complète (Étape 2).
