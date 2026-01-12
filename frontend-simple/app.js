@@ -16,10 +16,23 @@ function showSuccess(message) {
     setTimeout(() => successDiv.classList.add('hidden'), 3000);
 }
 
+async function getErrorMessage(response) {
+    try {
+        const data = await response.json();
+        if (data && data.error) return data.error;
+        return 'Erreur inconnue';
+    } catch (e) {
+        return 'Erreur inconnue';
+    }
+}
+
 async function loadStudents() {
     try {
         const response = await fetch(`${API_URL}/students`);
-        if (!response.ok) throw new Error('Erreur lors du chargement');
+        if (!response.ok) {
+            const msg = await getErrorMessage(response);
+            throw new Error(msg);
+        }
         
         const students = await response.json();
         const listDiv = document.getElementById('studentsList');
@@ -45,7 +58,7 @@ async function loadStudents() {
             </div>
         `).join('');
     } catch (error) {
-        showError('Erreur lors du chargement des étudiants');
+        showError(error.message || 'Erreur lors du chargement des étudiants');
         console.error(error);
     }
 }
@@ -77,12 +90,15 @@ async function deleteStudent(id) {
             method: 'DELETE'
         });
         
-        if (!response.ok) throw new Error('Erreur lors de la suppression');
+        if (!response.ok) {
+            const msg = await getErrorMessage(response);
+            throw new Error(msg);
+        }
         
         showSuccess('Étudiant supprimé avec succès');
         await loadStudents();
     } catch (error) {
-        showError('Erreur lors de la suppression');
+        showError(error.message || 'Erreur lors de la suppression');
         console.error(error);
     }
 }
@@ -109,13 +125,16 @@ document.getElementById('studentForm').addEventListener('submit', async (e) => {
             body: JSON.stringify(data)
         });
         
-        if (!response.ok) throw new Error('Erreur lors de l\'enregistrement');
+        if (!response.ok) {
+            const msg = await getErrorMessage(response);
+            throw new Error(msg);
+        }
         
         showSuccess(editingId ? 'Étudiant modifié avec succès' : 'Étudiant ajouté avec succès');
         cancelEdit();
         await loadStudents();
     } catch (error) {
-        showError('Erreur lors de l\'enregistrement');
+        showError(error.message || 'Erreur lors de l\'enregistrement');
         console.error(error);
     }
 });

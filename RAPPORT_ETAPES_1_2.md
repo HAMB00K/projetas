@@ -16,6 +16,7 @@
 minikube start --profile knative --driver=docker
 ```
 ![Screen](images_compte_rendu/s1.png)
+
 **Résultat:** Minikube démarre avec succès et crée un cluster Kubernetes avec le profil "knative".
 
 ---
@@ -28,6 +29,7 @@ minikube profile list
 docker ps | grep minikube
 ```
 ![Screen](images_compte_rendu/s2.png)
+
 **Résultat:**
 - Minikube utilise bien le driver Docker
 - Un conteneur Docker nommé "knative" est en cours d'exécution
@@ -42,6 +44,7 @@ docker ps | grep minikube
 minikube addons list --profile knative
 ```
 ![Screen](images_compte_rendu/s3.png)
+
 **Résultat - Addons activés:**
 -  **default-storageclass** - Kubernetes
 -  **storage-provisioner** - minikube  
@@ -60,6 +63,7 @@ minikube addons list --profile knative
 minikube profile list
 ```
 ![Screen](images_compte_rendu/s4.png)
+
 **Résultat:**
 ```
 PROFILE  DRIVER  RUNTIME  IP             VERSION  STATUS  NODES
@@ -84,6 +88,7 @@ knative  docker  docker   192.168.49.2   v1.32.0  OK      1
 minikube start --profile mon-nouveau-profil --driver=docker
 ```
 ![Screen](images_compte_rendu/s5.png)
+
 **Qu'est-ce qu'un profil ?**
 Un profil Minikube permet de créer et gérer plusieurs clusters Kubernetes indépendants sur la même machine. Chaque profil a:
 - Sa propre configuration
@@ -105,6 +110,7 @@ Un profil Minikube permet de créer et gérer plusieurs clusters Kubernetes ind�
 minikube status --profile knative
 ```
 ![Screen](images_compte_rendu/s6.png)
+
 **Résultat:**
 ```
 knative
@@ -260,6 +266,7 @@ minikube image ls --profile knative
 kubectl create deployment nginx --image=nginx
 ```
 ![Screen](images_compte_rendu/s13.png)
+
 **Résultat:**
 ```
 deployment.apps/nginx created
@@ -280,6 +287,7 @@ kubectl get pods -l app=nginx
 kubectl expose deployment nginx --type=NodePort --port=80
 ```
 ![Screen](images_compte_rendu/s14.png)
+
 **Résultat:**
 ```
 service/nginx exposed
@@ -300,12 +308,14 @@ kubectl get pods -l app=nginx
 kubectl describe pod -l app=nginx
 ```
 ![Screen](images_compte_rendu/s15pod.png)
+
 **Commande pour le service:**
 ```bash
 kubectl get svc nginx
 kubectl describe svc nginx
 ```
 ![Screen](images_compte_rendu/s15serv.png)
+
 **Informations affichées:**
 - **Pod**: Nom, statut, IP, nœud, image, ressources
 - **Service**: Type, ClusterIP, Port, NodePort, Endpoints
@@ -367,6 +377,7 @@ cat /etc/nginx/nginx.conf
 exit
 ```
 ![Screen](images_compte_rendu/s18.png)
+
 ---
 
 ### 19. Lister les logs du conteneur nginx
@@ -401,6 +412,7 @@ kubectl logs --tail=50 nginx-66686b6766-pts7s
 minikube stop --profile knative
 ```
 ![Screen](images_compte_rendu/s20p1.png)
+
 **Résultat:** Le cluster est arrêté mais les données persistent. Au prochain démarrage, tout sera restauré.
 
 **Pour supprimer complètement le cluster:**
@@ -408,6 +420,7 @@ minikube stop --profile knative
 minikube delete --profile knative
 ```
 ![Screen](images_compte_rendu/s20p2.png)
+
 
 ---
 
@@ -421,3 +434,48 @@ Toutes les manipulations Kubernetes de base ont été réalisées avec succès:
 -  Consultation des logs et métriques
 
 Le cluster Minikube est maintenant prêt pour le déploiement de l'architecture EDA complète (Étape 2).
+
+# Screens Etape 2
+
+![Screen](images_compte_rendu/e2i1.png)
+
+![Screen](images_compte_rendu/e2i2.png)
+
+![Screen](images_compte_rendu/e2i3.png)
+
+![Screen](images_compte_rendu/e2i4.png)
+
+![Screen](images_compte_rendu/e2i5.png)
+
+![Screen](images_compte_rendu/e2i6.png)
+
+![Screen](images_compte_rendu/e2i7.png)
+
+![Screen](images_compte_rendu/e2i8.png)
+
+![Screen](images_compte_rendu/e2i9.png)
+
+![Screen](images_compte_rendu/e2i10.png)
+
+![Screen](images_compte_rendu/e2i11.png)
+
+![Screen](images_compte_rendu/e2i12.png)
+
+![Screen](images_compte_rendu/e2i13.png)
+
+![Screen](images_compte_rendu/e2i14.png)
+
+![Screen](images_compte_rendu/e2i15.png)
+
+![Screen](images_compte_rendu/e2i16.png)
+
+![Screen](images_compte_rendu/e2i17.png)
+
+![Screen](images_compte_rendu/e2i18.png)
+
+![Screen](images_compte_rendu/e2i19.png)
+
+![Screen](images_compte_rendu/e2i20.png)
+
+
+

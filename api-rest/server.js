@@ -25,27 +25,66 @@ const consumer = kafka.consumer({ groupId: 'api-rest-response-group' });
 
 let responseCallbacks = new Map();
 
+let producerConnectPromise = null;
+let consumerStarted = false;
+
+async function ensureProducerConnected() {
+  if (producerConnectPromise) {
+    return producerConnectPromise;
+  }
+
+  producerConnectPromise = producer.connect().finally(() => {
+    producerConnectPromise = null;
+  });
+  return producerConnectPromise;
+}
+
+async function safeSend(topic, payload) {
+  try {
+    await producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(payload) }]
+    });
+  } catch (error) {
+    const msg = (error && error.message) ? error.message : String(error);
+    const shouldRetry = msg.toLowerCase().includes('disconnected') || msg.toLowerCase().includes('econnrefused');
+    if (!shouldRetry) {
+      throw error;
+    }
+
+    await ensureProducerConnected();
+    await producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(payload) }]
+    });
+  }
+}
+
 async function initKafka() {
   try {
-    await producer.connect();
+    await ensureProducerConnected();
     console.log('✅ Kafka Producer connected');
     
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'student-responses', fromBeginning: false });
-    console.log('✅ Kafka Consumer connected and subscribed to student-responses');
-    
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const response = JSON.parse(message.value.toString());
-        console.log('📨 Received response:', response);
-        
-        const callback = responseCallbacks.get(response.correlationId);
-        if (callback) {
-          callback(response);
-          responseCallbacks.delete(response.correlationId);
+    if (!consumerStarted) {
+      await consumer.connect();
+      await consumer.subscribe({ topic: 'student-responses', fromBeginning: false });
+      console.log('✅ Kafka Consumer connected and subscribed to student-responses');
+
+      await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const response = JSON.parse(message.value.toString());
+          console.log('📨 Received response:', response);
+
+          const callback = responseCallbacks.get(response.correlationId);
+          if (callback) {
+            callback(response);
+            responseCallbacks.delete(response.correlationId);
+          }
         }
-      }
-    });
+      });
+
+      consumerStarted = true;
+    }
   } catch (error) {
     console.error('❌ Kafka initialization error:', error);
     setTimeout(initKafka, 5000);
@@ -73,16 +112,13 @@ app.post('/api/students', async (req, res) => {
       data: { nom, prenom, email, age: age || null }
     };
 
-    await producer.send({
-      topic: 'student-events',
-      messages: [{ value: JSON.stringify(studentData) }]
-    });
+    await safeSend('student-events', studentData);
 
     const responsePromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         responseCallbacks.delete(correlationId);
         reject(new Error('Timeout waiting for response'));
-      }, 10000);
+      }, 20000);
 
       responseCallbacks.set(correlationId, (response) => {
         clearTimeout(timeout);
@@ -95,7 +131,9 @@ app.post('/api/students', async (req, res) => {
     if (response.success) {
       res.status(201).json(response.data);
     } else {
-      res.status(500).json({ error: response.error });
+      const errorMsg = response.error || 'Erreur inconnue';
+      const isDuplicateEmail = String(errorMsg).includes('students_email_key') || String(errorMsg).toLowerCase().includes('duplicate key');
+      res.status(isDuplicateEmail ? 409 : 500).json({ error: errorMsg });
     }
   } catch (error) {
     console.error('Error creating student:', error);
@@ -112,16 +150,13 @@ app.get('/api/students', async (req, res) => {
       data: {}
     };
 
-    await producer.send({
-      topic: 'student-events',
-      messages: [{ value: JSON.stringify(requestData) }]
-    });
+    await safeSend('student-events', requestData);
 
     const responsePromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         responseCallbacks.delete(correlationId);
         reject(new Error('Timeout waiting for response'));
-      }, 10000);
+      }, 20000);
 
       responseCallbacks.set(correlationId, (response) => {
         clearTimeout(timeout);
@@ -151,16 +186,13 @@ app.get('/api/students/:id', async (req, res) => {
       data: { id: req.params.id }
     };
 
-    await producer.send({
-      topic: 'student-events',
-      messages: [{ value: JSON.stringify(requestData) }]
-    });
+    await safeSend('student-events', requestData);
 
     const responsePromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         responseCallbacks.delete(correlationId);
         reject(new Error('Timeout waiting for response'));
-      }, 10000);
+      }, 20000);
 
       responseCallbacks.set(correlationId, (response) => {
         clearTimeout(timeout);
@@ -191,16 +223,13 @@ app.put('/api/students/:id', async (req, res) => {
       data: { id: req.params.id, nom, prenom, email, age }
     };
 
-    await producer.send({
-      topic: 'student-events',
-      messages: [{ value: JSON.stringify(studentData) }]
-    });
+    await safeSend('student-events', studentData);
 
     const responsePromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         responseCallbacks.delete(correlationId);
         reject(new Error('Timeout waiting for response'));
-      }, 10000);
+      }, 20000);
 
       responseCallbacks.set(correlationId, (response) => {
         clearTimeout(timeout);
@@ -230,16 +259,13 @@ app.delete('/api/students/:id', async (req, res) => {
       data: { id: req.params.id }
     };
 
-    await producer.send({
-      topic: 'student-events',
-      messages: [{ value: JSON.stringify(requestData) }]
-    });
+    await safeSend('student-events', requestData);
 
     const responsePromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         responseCallbacks.delete(correlationId);
         reject(new Error('Timeout waiting for response'));
-      }, 10000);
+      }, 20000);
 
       responseCallbacks.set(correlationId, (response) => {
         clearTimeout(timeout);
